@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <array>
 #include <algorithm>
 using namespace std;
 
@@ -54,6 +53,12 @@ class FloatArray
 				{return true;}  
 		}
 		
+		void printArray(){
+				std::cout << "[#] Printing the requested array" << endl;
+				for (int i=0; i<size; i++)
+				{std::cout << " " << arr[i];}
+		}
+
 		void append(float num){
 			// create new array
 			float* newarr = new float [size+1];
@@ -63,7 +68,7 @@ class FloatArray
 			float* tmp = arr;
 			arr = newarr;
 			delete [] tmp;
-			std::cout << "[#] element appended" << endl; // testing
+			std::cout << "[#] new element appended" << endl; // testing
 		}
 
 
@@ -81,6 +86,19 @@ class SortedArray: public FloatArray
 			std::sort(arr, arr+size, std::less<float>());
 			// sort( float arr,  array + size, greater<float>()); for decending order
 			std::cout << "[~] Array Sorted" << std::endl; // testing
+		}
+	public:
+		// constructors
+		SortedArray(int size): FloatArray(size){
+			keepSorted();
+			std::cout << "[~] Sorted Float Array created" << std::endl;
+		}
+		
+		
+		// methods
+		void append(float num) {
+			FloatArray::append(num);
+		   	keepSorted();
 		}
 };
 
@@ -104,3 +122,8 @@ class NegativeArray
 {
 
 };
+
+/*
+	NOTE: this need to be done taking into considration using polymorphism in main function
+		  using virtual functions is a MUST.
+*/
