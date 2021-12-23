@@ -20,8 +20,8 @@ public:
     FloatArray(int size){
         if (size > 0){
             arr = new float [size];
-            // set array default values = 0
-            for (int i=0; i < size; i++) {arr[i] = 0;}
+            // set array default values = 99999999
+            for (int i=0; i < size; i++) {arr[i] = 99999999;}
         }
     }
     
@@ -61,7 +61,7 @@ public:
             {cout << " " << arr[i];}
     }
 
-    void append(float num){
+    void add(float num){
         // create new array
         float* newarr = new float [size+1];
         for (int i=0; i < size; i++)
@@ -69,8 +69,9 @@ public:
         // set pointer to new array
         float* tmp = arr;
         arr = newarr;
-        cout << "enter a number: ";
-        cin >> arr[size];
+        for (int i = 0; i < size + 1; i++)
+        {cout << "enter a number: "; cin >> arr[size];}
+        
         delete [] tmp;
         cout << "[#] new element appended" << endl; // testing
     }
@@ -87,53 +88,60 @@ public:
 class SortedArray: public FloatArray
 {
 private:
-    float tmp_2;
-    float tmp_3;
-    void keepSorted()         // ascending order
-    {
-        sort(arr, arr+size, less<float>());
-        // sort( float arr,  array + size, greater<float>()); for decending order
-        cout << "[~] Array Sorted" <<endl; // testing
-    }
+    
 public:
     // constructors
     SortedArray(int size): FloatArray(size){
-        keepSorted();
         cout << "[~] Sorted Float Array created" << endl;
     }
     
     // methods
-    void append(float num) {
-        float* newarr = new float [size+1];
-        for (int i=0; i < size; i++)
-        {newarr[i] = arr[i];}
-        // set pointer to new array
-        float* tmp = arr;
-        arr = newarr;
-        cout << "enter a number: ";
-        cin >> tmp_2;
-        for (int i = 0 ; i < size+1; i++) {
-            if(tmp_2 < arr[i]) //condition to find the right position of the input number
-            {
-                for (int j = i; j < size+1; j++) { /* if the right position of number found move the position of each number after the right                                         position in arr by 1 */
-                    tmp_3 = arr[i];
-                    arr[i+1] = tmp_3;
+    void add(float num) {
+        
+        float input_num = 0;
+        
+        
+        cout << "Enter size of the array: ";
+        cin >> size;
+
+        float* array = new float[size];
+        
+        /*for (int i = 0; i < size; i++) {
+            array[i] = 99999;                  Maybe not needed as array is intialazed in parent class
+        }*/
+        
+        for (int k = 0; k < size; k++) {
+            
+            cout<<"Enter a number: ";
+            cin>>input_num;
+            
+            
+            for (int i = 0; i < size; i++) {
+                if(input_num < arr[i])
+                {
+                    for (int n = size - 1; n > i-1; n--) {
+                        arr[n+1] = arr[n];
+                    }
+                    arr[i] = input_num;
+                    
+                    for (int f = 0; f < size; f++) {
+                        cout<<"number "<<f+1<<" "<<arr[f]<<endl;
+                    }
+                    
+                    break;
                 }
-                arr[i] = tmp_2;
-                break;
             }
+            
         }
-        delete [] tmp;
-        cout << "[#] new element appended" << endl; // testing
-           
-    }
 };
 
 
 
-class FrontArray
+class FrontArray: public FloatArray
 {
-
+    void append(float num){
+        
+    }
 };
 
 
@@ -150,7 +158,7 @@ class NegativeArray
 
 };
 
-/*
-    NOTE: this need to be done taking into considration using polymorphism in main function
+
+  /*  NOTE: this need to be done taking into considration using polymorphism in main function
           using virtual functions is a MUST.
 */
