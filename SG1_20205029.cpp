@@ -89,12 +89,7 @@ class SortedArray: public FloatArray
 private:
     float tmp_2;
     float tmp_3;
-    void keepSorted()         // ascending order
-    {
-        sort(arr, arr+size, less<float>());
-        // sort( float arr,  array + size, greater<float>()); for decending order
-        cout << "[~] Array Sorted" <<endl; // testing
-    }
+
 public:
     // constructors
     SortedArray(int size): FloatArray(size){
@@ -103,6 +98,19 @@ public:
     }
     
     // methods
+    void keepSorted()         // ascending order
+    {
+        sort(arr, arr+size, less<float>());
+        // sort( float arr,  array + size, greater<float>()); for decending order
+        cout << "[~] Array Sorted" <<endl; // testing
+    }
+
+    bool isPositive(float value){
+        if (value>=0) {return true;}
+	else return false;
+    }		
+
+
     void append(float num) {
         float* newarr = new float [size+1];
         for (int i=0; i < size; i++)
@@ -131,24 +139,67 @@ public:
 
 
 
-class FrontArray
+class FrontArray: public FloatArray
 {
-
+	public:
+	// constructors
+	FrontArray(int size): FloatArray(size)
+	{cout << "[!] front array created" << endl;}
+	
+	
+	// methods
+	bool add(float value){
+		// create new array
+		float* newarr = new float [size+1];
+		for (int i=1; i < size; i++)
+		{newarr[i] = arr[i];}
+		// add value at the start of the array
+		newarr[0] = value;
+		// set pointer to new array
+		float* tmp = arr;
+		arr = newarr;
+		delete [] tmp;
+		// testing
+		if (arr[-1] == value){
+			std::cout << "[#] element appended" << endl;
+			return true;
+		}
+		return false
+	}
 };
 
 
 
-class PositiveArray
-{
 
+class PositiveArray: public SortedArray
+{
+	// constructors
+	PositiveArray(int size): SortedArray(size){
+		cout << "[!] positive array created" << endl;
+	}
+	// methods
+	bool add(float value){						// required method
+		// if value is positive add value
+		if (isPositive(value)) 
+		{add (value); return true;}
+		return false;
+	}
 };
 
 
-
-class NegativeArray
+class NegativeArray : SortedArray(size)
 {
-
+	// constructors
+	NegativeArray(int size): SortedArray(size)
+	{ cout << "Negative array created"<< endl;}
+	// methods
+	bool add(float value){
+		if (!isPositive(value)
+		{add (value); return true;}
+		return false;
+	}
 };
+
 
 /*
     NOTE: this need to be done taking into considration using polymorphism in main function
