@@ -116,31 +116,37 @@ public:
 
     bool isPositive(float value){
         if (value>=0) {return true;}
-	else return false;
+    else return false;
     }
 
     // error in add function: adding at any index ruins the elements after it excluding the last
 
 
     void add(float num) {
-		// create bigger array
-		float* newarr = new float [size+1];
-        for (int i=0; i < size; i++){
-			// adds new value if its smaller than the old array value once
-			int done=0;
-			if (num <= arr[i]){
-				newarr[i] = num;
-				newarr[i+1] = arr[i];
-				// make sure this runs 1 time only
-				num = arr[-1]+1;
-				done=1;
-			}
-			else {newarr[i+done]= arr[i];}
-		}
-		// set pointer to new array
+        // create bigger array
+        float* newarr = new float [size+1];
+        int counter = 0;
+        for (int i = 0; i < size; i++){
+            // adds new value if its smaller than the old array value once
+            
+            if (num <= arr[i]){
+                newarr[i] = num; // i = 2  - i = 3
+                newarr[i+1] = arr[i]; //newarr[3] = arr[2](4)
+                counter++;
+                break;
+            }
+            else {newarr[i]= arr[i]; counter++;} //newarr[4] =
+        
+        }
+        cout<<"counter is: "<<counter<<endl;
+        for (int k = size; k >= counter; k--) { // k = 6 || counter = 3 || size = 5
+            newarr[k] = arr[k-1];
+        }
+        
+        // set pointer to new array
         size++;
-        delete [] arr;
-        this->arr = newarr;
+        //delete [] arr;
+        arr = newarr;
         //delete [] tmp;
         //delete [] newarr;
         cout << "[#] new element appended" << endl; // testing
@@ -160,31 +166,31 @@ if new value > arr[i] -> set arr[i] = old value
 
 class FrontArray: public FloatArray
 {
-	public:
-	// constructors
-	FrontArray(int size): FloatArray(size)
-	{cout << "[!] front array created" << endl;}
+    public:
+    // constructors
+    FrontArray(int size): FloatArray(size)
+    {cout << "[!] front array created" << endl;}
 
 
-	// methods
-	bool add(float value){
-		// create new array
-		float* newarr = new float [size+1];
-		for (int i=0; i < size; i++)
-		{newarr[i+1] = arr[i];}
-		// add value at the start of the array
-		newarr[0] = value;
-		// set pointer to new array
-		float* tmp = arr;
-		arr = newarr;
-		delete [] tmp;
-		// testing
-		if (arr[0] == value){
-			std::cout << "[#] element appended" << endl;
-			return true;
-		}
-		return false;
-	}
+    // methods
+    bool add(float value){
+        // create new array
+        float* newarr = new float [size+1];
+        for (int i=0; i < size; i++)
+        {newarr[i+1] = arr[i];}
+        // add value at the start of the array
+        newarr[0] = value;
+        // set pointer to new array
+        float* tmp = arr;
+        arr = newarr;
+        delete [] tmp;
+        // testing
+        if (arr[0] == value){
+            std::cout << "[#] element appended" << endl;
+            return true;
+        }
+        return false;
+    }
 };
 
 
@@ -192,33 +198,33 @@ class FrontArray: public FloatArray
 
 class PositiveArray: public SortedArray
 {
-	// constructors
-	PositiveArray(int size): SortedArray(size){
-		cout << "[!] positive array created" << endl;
-	}
-	// methods
-	bool add(float value){
-		// if value is positive add value
-		if (isPositive(value))
-		{add (value); return true;}
-		return false;
-	}
+    // constructors
+    PositiveArray(int size): SortedArray(size){
+        cout << "[!] positive array created" << endl;
+    }
+    // methods
+    bool add(float value){
+        // if value is positive add value
+        if (isPositive(value))
+        {add (value); return true;}
+        return false;
+    }
 };
 
 
 class NegativeArray : public SortedArray
 {
-	// constructors
-	NegativeArray(int size): SortedArray(size)
-	{ cout << "Negative array created"<< endl;}
-	// methods
-	bool add(float value){
-		if (!isPositive(value)){
-		    add (value);
-		    return true;
+    // constructors
+    NegativeArray(int size): SortedArray(size)
+    { cout << "Negative array created"<< endl;}
+    // methods
+    bool add(float value){
+        if (!isPositive(value)){
+            add (value);
+            return true;
         }
-		else return false;
-	}
+        else return false;
+    }
 };
 
 
@@ -230,8 +236,9 @@ int main ()
     here.setArray(n);
     here.keepSorted();
     here.printArray();
+    
     //add where is right test
-    here.add(0);
+    here.add(1);
     here.printArray();
     return 0;
 }
