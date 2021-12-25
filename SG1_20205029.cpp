@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <algorithm>
 using namespace std;
 
@@ -19,24 +18,29 @@ public:
     // consturctors
     FloatArray(int size){
         if (size > 0){
+            this -> size = size;
             arr = new float [size];
             // set array default values = 0
             for (int i=0; i < size; i++) {arr[i] = 0;}
+            printArray();
         }
     }
-    
+
     ~FloatArray() {delete [] arr;}
-    
+
 
     // setters
     void setElement(int index, float element){
         if (indexVerfiy(index))
             {arr[index] = element;}
     }
-    
-    void setSize(int new_size)
+
+    void setArray(float* newarray)
+    {arr=newarray;}
+
+    void setSize(int new_size)  // segmentation error: create  a new array to fit the size
     {size = new_size;}
-    
+
 
     // getters
     float getElement(int index){
@@ -44,21 +48,22 @@ public:
             {return arr[index];}
         return 0;
     }
-    
+
     int getSize() {return size;}
-    
+
 
     // methods
     bool indexVerfiy(int index){
-        if (size >= index && index>0)
+        if ( (size >= index) && (index>=0))
             {return true;}
         return false;
     }
-    
+
     void printArray(){
             cout << "[#] Printing the requested array" << endl;
             for (int i=0; i<size; i++)
             {cout << " " << arr[i];}
+            cout << endl;
     }
 
     void append(float num){
@@ -66,6 +71,8 @@ public:
         float* newarr = new float [size+1];
         for (int i=0; i < size; i++)
         {newarr[i] = arr[i];}
+        // append value at the end of the array
+        newarr[-1] = num;
         // set pointer to new array
         float* tmp = arr;
         arr = newarr;
@@ -79,16 +86,14 @@ public:
     // overloading
     friend ostream& operator << (ostream& out, const FloatArray& arr  );        // read array from file
     friend istream& operator >> (istream& in,FloatArray arr);        // append array to file
-    //friend classes
+
     friend class SortedArray;
+    friend class FrontArray;
 };
 
 
 class SortedArray: public FloatArray
 {
-private:
-    float tmp_2;
-    float tmp_3;
 
 public:
     // constructors
@@ -96,48 +101,62 @@ public:
         keepSorted();
         cout << "[~] Sorted Float Array created" << endl;
     }
-    
+    // setters
+        void setElement(int index, float element){
+            FloatArray::setElement(index, element);
+            keepSorted();
+    }
+
     // methods
-    void keepSorted()         // ascending order
-    {
+    void keepSorted(){         // ascending order
         sort(arr, arr+size, less<float>());
         // sort( float arr,  array + size, greater<float>()); for decending order
-        cout << "[~] Array Sorted" <<endl; // testing
+        cout << "[~] Array resorted" <<endl; // testing
     }
 
     bool isPositive(float value){
         if (value>=0) {return true;}
 	else return false;
-    }		
+    }
+
+    // error in add function: adding at any index ruins the elements after it excluding the last
 
 
-    void append(float num) {
-        float* newarr = new float [size+1];
-        for (int i=0; i < size; i++)
-        {newarr[i] = arr[i];}
-        // set pointer to new array
-        float* tmp = arr;
-        arr = newarr;
-        cout << "enter a number: ";
-        cin >> tmp_2;
-        for (int i = 0 ; i < size+1; i++) {
-            if(tmp_2 < arr[i]) //condition to find the right position of the input number
-            {
-                for (int j = i; j < size+1; j++) { /* if the right position of number found move the position of each number after the right                                         position in arr by 1 */
-                    tmp_3 = arr[i];
-                    arr[i+1] = tmp_3;
-                }
-                arr[i] = tmp_2;
-                break;
-            }
-        }
-        delete [] tmp;
+    void add(float num) {
+		// create bigger array
+		float* newarr = new float [size+1];
+        for (int i=0; i < size; i++){
+			// adds new value if its smaller than the old array value once
+			int done=0;
+			if (num <= arr[i]){
+				newarr[i] = num;
+				newarr[i+1] = arr[i];
+				// make sure this runs 1 time only
+				num = arr[-1]+1;
+				done=1;
+			}
+			else {newarr[i+done]= arr[i];}
+		}
+		// set pointer to new array
+        size++;
+        delete [] arr;
+        this->arr = newarr;
+        //delete [] tmp;
+        //delete [] newarr;
         cout << "[#] new element appended" << endl; // testing
-           
     }
 };
+/*
 
+[1, 2, 4, 7, 9]
+                10
+[1, 2, 3, 4, 7, 9]
+add(3)
 
+if new value < arr[i] -> set arr[i] = new value
+if new value > arr[i] -> set arr[i] = old value
+
+*/
 
 class FrontArray: public FloatArray
 {
@@ -145,14 +164,14 @@ class FrontArray: public FloatArray
 	// constructors
 	FrontArray(int size): FloatArray(size)
 	{cout << "[!] front array created" << endl;}
-	
-	
+
+
 	// methods
 	bool add(float value){
 		// create new array
 		float* newarr = new float [size+1];
-		for (int i=1; i < size; i++)
-		{newarr[i] = arr[i];}
+		for (int i=0; i < size; i++)
+		{newarr[i+1] = arr[i];}
 		// add value at the start of the array
 		newarr[0] = value;
 		// set pointer to new array
@@ -160,11 +179,11 @@ class FrontArray: public FloatArray
 		arr = newarr;
 		delete [] tmp;
 		// testing
-		if (arr[-1] == value){
+		if (arr[0] == value){
 			std::cout << "[#] element appended" << endl;
 			return true;
 		}
-		return false
+		return false;
 	}
 };
 
@@ -178,30 +197,46 @@ class PositiveArray: public SortedArray
 		cout << "[!] positive array created" << endl;
 	}
 	// methods
-	bool add(float value){						// required method
+	bool add(float value){
 		// if value is positive add value
-		if (isPositive(value)) 
+		if (isPositive(value))
 		{add (value); return true;}
 		return false;
 	}
 };
 
 
-class NegativeArray : SortedArray(size)
+class NegativeArray : public SortedArray
 {
 	// constructors
 	NegativeArray(int size): SortedArray(size)
 	{ cout << "Negative array created"<< endl;}
 	// methods
 	bool add(float value){
-		if (!isPositive(value)
-		{add (value); return true;}
-		return false;
+		if (!isPositive(value)){
+		    add (value);
+		    return true;
+        }
+		else return false;
 	}
 };
 
 
+
+int main ()
+{
+    SortedArray here(5);
+    float n[5] = {2,0.6,4,10,8};
+    here.setArray(n);
+    here.keepSorted();
+    here.printArray();
+    //add where is right test
+    here.add(0);
+    here.printArray();
+    return 0;
+}
+
+
 /*
     NOTE: this need to be done taking into considration using polymorphism in main function
-          using virtual functions is a MUST.
 */
